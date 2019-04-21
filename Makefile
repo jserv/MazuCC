@@ -2,7 +2,7 @@ TARGET = mzcc
 
 CFLAGS = -Wall -Werror -std=gnu99 -g -I.
 
-NAME_S := $(shell uname -s)
+UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 CFLAGS += -no-pie
 endif
