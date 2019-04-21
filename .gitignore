@@ -1,5 +1,6 @@
 mzcc
 *.o
+*.o.d
 tmp.*
 nqueen.s
 nqueen
