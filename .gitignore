@@ -1,0 +1,7 @@
+mzcc
+*.o
+tmp.*
+nqueen.s
+nqueen
+*.bin
+*.dSYM
