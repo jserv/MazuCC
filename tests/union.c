@@ -1,3 +1,5 @@
+/* Test union */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -41,12 +43,9 @@ int t3()
 
 int main()
 {
-    printf("Testing union ... ");
-
     t1();
     t2();
     t3();
 
-    printf("OK\n");
     return 0;
 }

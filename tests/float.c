@@ -1,3 +1,5 @@
+/* Test floating point */
+
 int expect(float a, float b)
 {
     if (!(a == b)) {
@@ -9,8 +11,6 @@ int expect(float a, float b)
 
 int main()
 {
-    printf("Testing float ... ");
-
     expect(1.0, 1.0);
     expect(1.5, 1.0 + 0.5);
     expect(0.5, 1.0 - 0.5);
@@ -22,6 +22,5 @@ int main()
     expect(2.0, 1.0 * 2);
     expect(0.25, 1.0 / 4);
 
-    printf("OK\n");
     return 0;
 }

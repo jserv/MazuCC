@@ -1,3 +1,5 @@
+/* Test array */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -73,8 +75,6 @@ int t7()
 
 int main()
 {
-    printf("Testing array ... ");
-
     t1();
     t2();
     t3();
@@ -83,6 +83,5 @@ int main()
     t6();
     t7();
 
-    printf("OK\n");
     return 0;
 }

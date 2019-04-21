@@ -1,3 +1,5 @@
+/* Test declaration */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -50,8 +52,6 @@ int t6()
 
 int main()
 {
-    printf("Testing declaration ... ");
-
     t1();
     t2();
     t3();
@@ -59,6 +59,5 @@ int main()
     t5();
     t6();
 
-    printf("OK\n");
     return 0;
 }

@@ -1,3 +1,5 @@
+/* Test long integer */
+
 int expect(long a, long b)
 {
     if (!(a == b)) {
@@ -9,12 +11,9 @@ int expect(long a, long b)
 
 int main()
 {
-    printf("Testing long ... ");
-
     expect(10L, 10L);
     expect(1152921504606846976, 1152921504606846976);
     expect(1152921504606846977, 1152921504606846976 + 1);
 
-    printf("OK\n");
     return 0;
 }

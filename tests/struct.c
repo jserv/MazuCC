@@ -1,3 +1,5 @@
+/* Test struct */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -163,8 +165,6 @@ int t12()
 
 int main()
 {
-    printf("Testing struct ... ");
-
     t1();
     t2();
     t3();
@@ -178,6 +178,5 @@ int main()
     t11();
     t12();
 
-    printf("OK\n");
     return 0;
 }

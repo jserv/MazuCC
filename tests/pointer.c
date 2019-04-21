@@ -1,3 +1,5 @@
+/* Test pointer */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -42,14 +44,11 @@ int t5()
 
 int main()
 {
-    printf("Testing pointer ... ");
-
     t1();
     t2();
     t3();
     t4();
     t5();
 
-    printf("OK\n");
     return 0;
 }

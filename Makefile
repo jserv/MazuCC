@@ -28,10 +28,19 @@ $(TARGET): $(OBJS)
 	$(Q)$(CC) $(CFLAGS) -o $@ $^
 
 TESTS := $(patsubst %.c,%.bin,$(wildcard tests/*.c))
+
+PASS_COLOR = \e[32;01m
+NO_COLOR = \e[0m
+pass = printf "[ $(PASS_COLOR)Passed$(NO_COLOR) ]\n"
+
 check: nqueen $(TESTS)
 	@echo
-	@for test in $(TESTS); do \
-	    ./$$test;             \
+	@for test in $(TESTS); do                        \
+	    printf "*** verify $$test ***\n"	;        \
+	    head -n 1 `echo $$test | sed s/.bin/.c/`;    \
+	    ./$$test;                                    \
+	    $(call pass,$$test);                         \
+	    echo;                                        \
 	done
 	tests/driver.sh
 

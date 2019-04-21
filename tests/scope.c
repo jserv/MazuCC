@@ -1,3 +1,5 @@
+/* Test scope */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -9,8 +11,6 @@ int expect(int a, int b)
 
 int main()
 {
-    printf("Testing scope ... ");
-
     int a = 31;
     {
         int a = 64;
@@ -21,6 +21,5 @@ int main()
         expect(64, a);
     }
 
-    printf("OK\n");
     return 0;
 }

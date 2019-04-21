@@ -1,3 +1,5 @@
+/* Test control flow */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -111,11 +113,8 @@ int testfor()
 
 int main()
 {
-    printf("Testing control flow ... ");
-
     testif();
     testfor();
 
-    printf("OK\n");
     return 0;
 }

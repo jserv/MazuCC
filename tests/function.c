@@ -1,3 +1,5 @@
+/* Test function */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -71,14 +73,11 @@ int t5()
 
 int main()
 {
-    printf("Testing function ... ");
-
     expect(77, t1());
     t2(79);
     t3(1, 2, 3, 4, 5, 6);
     t4();
     t5();
 
-    printf("OK\n");
     return 0;
 }

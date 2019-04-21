@@ -1,3 +1,5 @@
+/* Test basic arithmetic */
+
 int expect(int a, int b)
 {
     if (!(a == b)) {
@@ -61,8 +63,6 @@ int test_bitand()
 
 int main()
 {
-    printf("Testing basic arithmetic ... ");
-
     test_basic();
     test_inc_dec();
     test_bool();
@@ -70,6 +70,5 @@ int main()
     test_logand();
     test_bitand();
 
-    printf("OK\n");
     return 0;
 }
