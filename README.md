@@ -46,6 +46,16 @@ Q . . . . . . .
 . . . Q . . . .
 ```
 
+Alternatively, you can dump internal abstract syntax tree:
+```shell
+$ echo 'struct {int x; char y;} a;' | ./mzcc --dump-ast
+```
+
+The expected output is
+```
+(decl (struct (int)
+              (char)) a)
+```
 
 ## Acknowledge
 
