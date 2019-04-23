@@ -109,14 +109,4 @@ static inline int list_len(List *list)
     return list->len;
 }
 
-static inline void *list_last(List *list)
-{
-    if (!list->head)
-        return NULL;
-    ListNode *p = list->head;
-    while (p->next)
-        p = p->next;
-    return p->elem;
-}
-
 #endif /* MAZUCC_LIST_H */

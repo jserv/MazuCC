@@ -81,16 +81,6 @@ static inline void errorf(char *file, int line, char *fmt, ...)
     exit(1);
 }
 
-static inline void warn(char *fmt, ...)
-{
-    fprintf(stderr, "warning: ");
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, "\n");
-    va_end(args);
-}
-
 static inline char *quote_cstring(char *p)
 {
     String *s = make_string();
