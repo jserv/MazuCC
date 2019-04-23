@@ -48,13 +48,14 @@ Q . . . . . . .
 
 Alternatively, you can dump internal abstract syntax tree:
 ```shell
-$ echo 'struct {int x; char y;} a;' | ./mzcc --dump-ast
+echo 'struct {int x; char y; struct { int t; } z; } a;' | ./mzcc --dump-ast
 ```
 
-The expected output is
+The expected output in S-expression form:
 ```
 (decl (struct (int)
-              (char)) a)
+              (char)
+              ((struct (int)))) a)
 ```
 
 ## Acknowledge
