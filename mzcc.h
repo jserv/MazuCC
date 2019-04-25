@@ -2,11 +2,12 @@
 #define MAZUCC_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "dict.h"
 #include "list.h"
 #include "util.h"
 
-enum {
+enum TokenType {
     TTYPE_IDENT,
     TTYPE_PUNCT,
     TTYPE_NUMBER,
@@ -16,11 +17,7 @@ enum {
 
 typedef struct {
     int type;
-    union {
-        char *sval;
-        int punct;
-        char c;
-    };
+    uintptr_t priv;
 } Token;
 
 enum {

@@ -3,45 +3,19 @@
 #include <stdlib.h>
 #include "mzcc.h"
 
+#define make_strtok(x) make_token(TTYPE_STRING, (uintptr_t) get_cstring(x))
+#define make_ident(x) make_token(TTYPE_IDENT, (uintptr_t) get_cstring(x))
+#define make_punct(x) make_token(TTYPE_PUNCT, (uintptr_t) (x))
+#define make_number(x) make_token(TTYPE_NUMBER, (uintptr_t) (x))
+#define make_char(x) make_token(TTYPE_CHAR, (uintptr_t) (x))
+
 static Token *ungotten = NULL;
 
-static Token *make_ident(String *s)
+static Token *make_token(enum TokenType type, uintptr_t data)
 {
     Token *r = malloc(sizeof(Token));
-    r->type = TTYPE_IDENT;
-    r->sval = get_cstring(s);
-    return r;
-}
-
-static Token *make_strtok(String *s)
-{
-    Token *r = malloc(sizeof(Token));
-    r->type = TTYPE_STRING;
-    r->sval = get_cstring(s);
-    return r;
-}
-
-static Token *make_punct(int punct)
-{
-    Token *r = malloc(sizeof(Token));
-    r->type = TTYPE_PUNCT;
-    r->punct = punct;
-    return r;
-}
-
-static Token *make_number(char *s)
-{
-    Token *r = malloc(sizeof(Token));
-    r->type = TTYPE_NUMBER;
-    r->sval = s;
-    return r;
-}
-
-static Token *make_char(char c)
-{
-    Token *r = malloc(sizeof(Token));
-    r->type = TTYPE_CHAR;
-    r->c = c;
+    r->type = type;
+    r->priv = data;
     return r;
 }
 
@@ -235,7 +209,7 @@ static Token *read_token_int(void)
 
 bool is_punct(Token *tok, int c)
 {
-    return tok && (tok->type == TTYPE_PUNCT) && (tok->punct == c);
+    return tok && (tok->type == TTYPE_PUNCT) && ((int) tok->priv == c);
 }
 
 void unget_token(Token *tok)

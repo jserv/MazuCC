@@ -217,20 +217,20 @@ char *token_to_string(Token *tok)
     String *s = make_string();
     switch (tok->type) {
     case TTYPE_IDENT:
-        return tok->sval;
+        return (char *) tok->priv;
     case TTYPE_PUNCT:
         if (is_punct(tok, PUNCT_EQ))
             string_appendf(s, "==");
         else
-            string_appendf(s, "%c", tok->c);
+            string_appendf(s, "%c", (char) tok->priv);
         return get_cstring(s);
     case TTYPE_CHAR:
-        string_append(s, tok->c);
+        string_append(s, (char) tok->priv);
         return get_cstring(s);
     case TTYPE_NUMBER:
-        return tok->sval;
+        return (char *) tok->priv;
     case TTYPE_STRING:
-        string_appendf(s, "\"%s\"", tok->sval);
+        string_appendf(s, "\"%s\"", (char *) tok->priv);
         return get_cstring(s);
     }
     error("internal error: unknown token type: %d", tok->type);
