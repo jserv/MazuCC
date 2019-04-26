@@ -215,24 +215,24 @@ char *token_to_string(Token *tok)
     if (!tok)
         return "(null)";
     String *s = make_string();
-    switch (tok->type) {
+    switch (get_ttype(tok)) {
     case TTYPE_IDENT:
-        return (char *) tok->priv;
+        return get_ident(tok);
     case TTYPE_PUNCT:
         if (is_punct(tok, PUNCT_EQ))
             string_appendf(s, "==");
         else
-            string_appendf(s, "%c", (char) tok->priv);
+            string_appendf(s, "%c", get_punct(tok));
         return get_cstring(s);
     case TTYPE_CHAR:
-        string_append(s, (char) tok->priv);
+        string_append(s, get_char(tok));
         return get_cstring(s);
     case TTYPE_NUMBER:
-        return (char *) tok->priv;
+        return get_number(tok);
     case TTYPE_STRING:
-        string_appendf(s, "\"%s\"", (char *) tok->priv);
+        string_appendf(s, "\"%s\"", get_strtok(tok));
         return get_cstring(s);
     }
-    error("internal error: unknown token type: %d", tok->type);
+    error("internal error: unknown token type: %d", get_ttype(tok));
     return NULL; /* non-reachable */
 }

@@ -209,7 +209,7 @@ static Token *read_token_int(void)
 
 bool is_punct(Token *tok, int c)
 {
-    return tok && (tok->type == TTYPE_PUNCT) && ((int) tok->priv == c);
+    return tok && (get_ttype(tok) == TTYPE_PUNCT) && (get_punct(tok) == c);
 }
 
 void unget_token(Token *tok)

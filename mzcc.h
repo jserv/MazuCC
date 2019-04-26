@@ -168,6 +168,30 @@ extern void unget_token(Token *tok);
 extern Token *peek_token(void);
 extern Token *read_token(void);
 
+#define get_priv(tok, type)                                         \
+({                                                                  \
+        assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
+        ((type) tok->priv);                                         \
+})
+
+#define get_ttype(tok)                                              \
+({                                                                  \
+        assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
+        (tok->type);                                                \
+})
+
+#define get_token(tok, ttype, priv_type)                            \
+({                                                                  \
+        assert(get_ttype(tok) == ttype);                            \
+        get_priv(tok, priv_type);                                   \
+})
+
+#define get_char(tok) get_token(tok, TTYPE_CHAR, char)
+#define get_strtok(tok) get_token(tok, TTYPE_STRING, char *)
+#define get_ident(tok) get_token(tok, TTYPE_IDENT, char *)
+#define get_number(tok) get_token(tok, TTYPE_NUMBER, char *)
+#define get_punct(tok) get_token(tok, TTYPE_PUNCT, int)
+
 /* parser.c */
 extern List *strings;
 extern List *flonums;
