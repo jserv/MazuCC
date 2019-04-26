@@ -298,12 +298,12 @@ static void expect(char punct)
 
 static bool is_ident(Token *tok, char *s)
 {
-    return tok->type == TTYPE_IDENT && !strcmp(tok->sval, s);
+    return get_ttype(tok) == TTYPE_IDENT && !strcmp(get_ident(tok), s);
 }
 
 static bool is_right_assoc(Token *tok)
 {
-    return tok->punct == '=';
+    return get_punct(tok) == '=';
 }
 
 static int eval_intexpr(Ast *ast)
@@ -329,7 +329,7 @@ static int eval_intexpr(Ast *ast)
 
 static int priority(Token *tok)
 {
-    switch (tok->punct) {
+    switch (get_punct(tok)) {
     case '[':
     case '.':
     case PUNCT_ARROW:
@@ -432,25 +432,27 @@ static Ast *read_prim(void)
     Token *tok = read_token();
     if (!tok)
         return NULL;
-    switch (tok->type) {
+    switch (get_ttype(tok)) {
     case TTYPE_IDENT:
-        return read_ident_or_func(tok->sval);
-    case TTYPE_NUMBER:
-        if (is_long_token(tok->sval))
-            return ast_inttype(ctype_long, atol(tok->sval));
-        if (is_int_token(tok->sval)) {
-            long val = atol(tok->sval);
+        return read_ident_or_func(get_ident(tok));
+    case TTYPE_NUMBER: {
+        char *number = get_number(tok);
+        if (is_long_token(number))
+            return ast_inttype(ctype_long, atol(number));
+        if (is_int_token(number)) {
+            long val = atol(number);
             if (val & ~(long) UINT_MAX)
                 return ast_inttype(ctype_long, val);
             return ast_inttype(ctype_int, val);
         }
-        if (is_float_token(tok->sval))
-            return ast_double(atof(tok->sval));
+        if (is_float_token(number))
+            return ast_double(atof(number));
         error("Malformed number: %s", token_to_string(tok));
+    }
     case TTYPE_CHAR:
-        return ast_inttype(ctype_char, tok->c);
+        return ast_inttype(ctype_char, get_char(tok));
     case TTYPE_STRING: {
-        Ast *r = ast_string(tok->sval);
+        Ast *r = ast_string(get_strtok(tok));
         list_push(strings, r);
         return r;
     }
@@ -458,7 +460,7 @@ static Ast *read_prim(void)
         unget_token(tok);
         return NULL;
     default:
-        error("internal error: unknown token type: %d", tok->type);
+        error("internal error: unknown token type: %d", get_ttype(tok));
         return NULL; /* non-reachable */
     }
 }
@@ -561,7 +563,7 @@ static Ctype *result_type(char op, Ctype *a, Ctype *b)
 static Ast *read_unary_expr(void)
 {
     Token *tok = read_token();
-    if (tok->type != TTYPE_PUNCT) {
+    if (get_ttype(tok) != TTYPE_PUNCT) {
         unget_token(tok);
         return read_prim();
     }
@@ -603,10 +605,11 @@ static Ast *read_struct_field(Ast *struc)
     if (struc->ctype->type != CTYPE_STRUCT)
         error("struct expected, but got %s", ast_to_string(struc));
     Token *name = read_token();
-    if (name->type != TTYPE_IDENT)
+    if (get_ttype(name) != TTYPE_IDENT)
         error("field name expected, but got %s", token_to_string(name));
-    Ctype *field = dict_get(struc->ctype->fields, name->sval);
-    return ast_struct_ref(field, struc, name->sval);
+    char *ident = get_ident(name);
+    Ctype *field = dict_get(struc->ctype->fields, ident);
+    return ast_struct_ref(field, struc, ident);
 }
 
 static Ast *read_expr_int(int prec)
@@ -616,7 +619,7 @@ static Ast *read_expr_int(int prec)
         return NULL;
     while (1) {
         Token *tok = read_token();
-        if (tok->type != TTYPE_PUNCT) {
+        if (get_ttype(tok) != TTYPE_PUNCT) {
             unget_token(tok);
             return ast;
         }
@@ -648,7 +651,7 @@ static Ast *read_expr_int(int prec)
         // this is BUG!! ++ should be in read_unary_expr() , I think.
         if (is_punct(tok, PUNCT_INC) || is_punct(tok, PUNCT_DEC)) {
             ensure_lvalue(ast);
-            ast = ast_uop(tok->punct, ast->ctype, ast);
+            ast = ast_uop(get_punct(tok), ast->ctype, ast);
             continue;
         }
         if (is_punct(tok, '='))
@@ -656,7 +659,7 @@ static Ast *read_expr_int(int prec)
         Ast *rest = read_expr_int(prec2 + (is_right_assoc(tok) ? 1 : 0));
         if (!rest)
             error("second operand missing");
-        ast = ast_binop(tok->punct, ast, rest);
+        ast = ast_binop(get_punct(tok), ast, rest);
     }
 }
 
@@ -667,19 +670,21 @@ static Ast *read_expr(void)
 
 static Ctype *get_ctype(Token *tok)
 {
+    char *ident;
     if (!tok)
         return NULL;
-    if (tok->type != TTYPE_IDENT)
+    if (get_ttype(tok) != TTYPE_IDENT)
         return NULL;
-    if (!strcmp(tok->sval, "int"))
+    ident = get_ident(tok);
+    if (!strcmp(ident, "int"))
         return ctype_int;
-    if (!strcmp(tok->sval, "long"))
+    if (!strcmp(ident, "long"))
         return ctype_long;
-    if (!strcmp(tok->sval, "char"))
+    if (!strcmp(ident, "char"))
         return ctype_char;
-    if (!strcmp(tok->sval, "float"))
+    if (!strcmp(ident, "float"))
         return ctype_float;
-    if (!strcmp(tok->sval, "double"))
+    if (!strcmp(ident, "double"))
         return ctype_double;
     return NULL;
 }
@@ -692,8 +697,8 @@ static bool is_type_keyword(Token *tok)
 static Ast *read_decl_array_init_int(Ctype *ctype)
 {
     Token *tok = read_token();
-    if (ctype->ptr->type == CTYPE_CHAR && tok->type == TTYPE_STRING)
-        return ast_string(tok->sval);
+    if (ctype->ptr->type == CTYPE_CHAR && get_ttype(tok) == TTYPE_STRING)
+        return ast_string(get_strtok(tok));
     if (!is_punct(tok, '{'))
         error("Expected an initializer list for %s, but got %s",
               ctype_to_string(ctype), token_to_string(tok));
@@ -716,8 +721,8 @@ static Ast *read_decl_array_init_int(Ctype *ctype)
 static char *read_struct_union_tag(void)
 {
     Token *tok = read_token();
-    if (tok->type == TTYPE_IDENT)
-        return tok->sval;
+    if (get_ttype(tok) == TTYPE_IDENT)
+        return get_ident(tok);
     unget_token(tok);
     return NULL;
 }
@@ -731,7 +736,7 @@ static Dict *read_struct_union_fields(void)
             break;
         Token *name;
         Ctype *fieldtype = read_decl_int(&name);
-        dict_put(r, name->sval, make_struct_field_type(fieldtype, 0));
+        dict_put(r, get_ident(name), make_struct_field_type(fieldtype, 0));
         expect(';');
     }
     expect('}');
@@ -864,7 +869,7 @@ static Ctype *read_decl_int(Token **name)
 {
     Ctype *ctype = read_decl_spec();
     *name = read_token();
-    if ((*name)->type != TTYPE_IDENT)
+    if (get_ttype((*name)) != TTYPE_IDENT)
         error("Identifier expected, but got %s", token_to_string(*name));
     return read_array_dimensions(ctype);
 }
@@ -873,7 +878,7 @@ static Ast *read_decl(void)
 {
     Token *varname;
     Ctype *ctype = read_decl_int(&varname);
-    Ast *var = ast_lvar(ctype, varname->sval);
+    Ast *var = ast_lvar(ctype, get_ident(varname));
     return read_decl_init(var);
 }
 
@@ -884,7 +889,7 @@ static Ast *read_if_stmt(void)
     expect(')');
     Ast *then = read_stmt();
     Token *tok = read_token();
-    if (!tok || tok->type != TTYPE_IDENT || strcmp(tok->sval, "else")) {
+    if (!tok || get_ttype(tok) != TTYPE_IDENT || strcmp(get_ident(tok), "else")) {
         unget_token(tok);
         return ast_if(cond, then, NULL);
     }
@@ -986,12 +991,12 @@ static List *read_params(void)
     while (1) {
         Ctype *ctype = read_decl_spec();
         Token *pname = read_token();
-        if (pname->type != TTYPE_IDENT)
+        if (get_ttype(pname) != TTYPE_IDENT)
             error("Identifier expected, but got %s", token_to_string(pname));
         ctype = read_array_dimensions(ctype);
         if (ctype->type == CTYPE_ARRAY)
             ctype = make_ptr_type(ctype->ptr);
-        list_push(params, ast_lvar(ctype, pname->sval));
+        list_push(params, ast_lvar(ctype, get_ident(pname)));
         Token *tok = read_token();
         if (is_punct(tok, ')'))
             return params;
@@ -1022,19 +1027,21 @@ static Ast *read_decl_or_func_def(void)
         return NULL;
     Ctype *ctype = read_decl_spec();
     Token *name = read_token();
-    if (name->type != TTYPE_IDENT)
+    char *ident;
+    if (get_ttype(name) != TTYPE_IDENT)
         error("Identifier expected, but got %s", token_to_string(name));
+    ident = get_ident(name);
     ctype = read_array_dimensions(ctype);
     tok = peek_token();
     if (is_punct(tok, '=') || ctype->type == CTYPE_ARRAY) {
-        Ast *var = ast_gvar(ctype, name->sval, false);
+        Ast *var = ast_gvar(ctype, ident, false);
         return read_decl_init(var);
     }
     if (is_punct(tok, '('))
-        return read_func_def(ctype, name->sval);
+        return read_func_def(ctype, ident);
     if (is_punct(tok, ';')) {
         read_token();
-        Ast *var = ast_gvar(ctype, name->sval, false);
+        Ast *var = ast_gvar(ctype, ident, false);
         return ast_decl(var, NULL);
     }
     error("Don't know how to handle %s", token_to_string(tok));
