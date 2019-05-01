@@ -669,7 +669,7 @@ static Ast *read_expr_int(int prec)
         if (is_punct(tok, PUNCT_LSHIFT) || is_punct(tok, PUNCT_RSHIFT)) {
             if ((ast->ctype != ctype_int && ast->ctype != ctype_char) ||
                 (rest->ctype != ctype_int && rest->ctype != ctype_char))
-                error("invalid operand to logical shift");
+                error("invalid operand to shift");
         }
         ast = ast_binop(get_punct(tok), ast, rest);
     }
