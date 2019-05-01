@@ -321,6 +321,10 @@ static int eval_intexpr(Ast *ast)
         return eval_intexpr(ast->left) * eval_intexpr(ast->right);
     case '/':
         return eval_intexpr(ast->left) / eval_intexpr(ast->right);
+    case PUNCT_LSHIFT:
+        return eval_intexpr(ast->left) >> eval_intexpr(ast->right);
+    case PUNCT_RSHIFT:
+        return eval_intexpr(ast->left) << eval_intexpr(ast->right);
     default:
         error("Integer expression expected, but got %s", ast_to_string(ast));
         return 0; /* non-reachable */
@@ -343,6 +347,9 @@ static int priority(Token *tok)
     case '+':
     case '-':
         return 4;
+    case PUNCT_LSHIFT:
+    case PUNCT_RSHIFT:
+        return 5;
     case '<':
     case '>':
         return 6;

@@ -43,6 +43,8 @@ enum {
     PUNCT_LOGAND,
     PUNCT_LOGOR,
     PUNCT_ARROW,
+    PUNCT_LSHIFT,
+    PUNCT_RSHIFT,
 };
 
 enum {
