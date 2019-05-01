@@ -61,6 +61,12 @@ int test_bitand()
     expect(1, 1 & 3);
 }
 
+int test_shift()
+{
+    expect(8, 4 << 1);
+    expect(3, 7 >> 1);
+}
+
 int main()
 {
     test_basic();
@@ -69,6 +75,6 @@ int main()
     test_ternary();
     test_logand();
     test_bitand();
-
+    test_shift();
     return 0;
 }
