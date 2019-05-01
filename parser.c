@@ -666,6 +666,11 @@ static Ast *read_expr_int(int prec)
         Ast *rest = read_expr_int(prec2 + (is_right_assoc(tok) ? 1 : 0));
         if (!rest)
             error("second operand missing");
+        if (is_punct(tok, PUNCT_LSHIFT) || is_punct(tok, PUNCT_RSHIFT)) {
+            if ((ast->ctype != ctype_int && ast->ctype != ctype_char) ||
+                (rest->ctype != ctype_int && rest->ctype != ctype_char))
+                error("invalid operand to logical shift");
+        }
         ast = ast_binop(get_punct(tok), ast, rest);
     }
 }
@@ -896,7 +901,8 @@ static Ast *read_if_stmt(void)
     expect(')');
     Ast *then = read_stmt();
     Token *tok = read_token();
-    if (!tok || get_ttype(tok) != TTYPE_IDENT || strcmp(get_ident(tok), "else")) {
+    if (!tok || get_ttype(tok) != TTYPE_IDENT ||
+        strcmp(get_ident(tok), "else")) {
         unget_token(tok);
         return ast_if(cond, then, NULL);
     }
