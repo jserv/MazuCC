@@ -333,8 +333,7 @@ static void emit_binop_int_arith(Ast *ast)
     if (ast->type == '/') {
         emit("mov $0, %%edx");
         emit("idiv %%rcx");
-    } else if (ast->type == PUNCT_LSHIFT ||
-               ast->type == PUNCT_RSHIFT) {
+    } else if (ast->type == PUNCT_LSHIFT || ast->type == PUNCT_RSHIFT) {
         emit("%s %%cl, %%rax", op);
     } else {
         emit("%s %%rcx, %%rax", op);
