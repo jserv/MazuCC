@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 function compile {
     echo "$1" > /dev/stderr
