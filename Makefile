@@ -7,6 +7,8 @@ ifeq ($(UNAME_S),Linux)
 CFLAGS += -no-pie
 endif
 
+SHELL_HACK := $(shell echo CBUILD=\"$(CC) $(CFLAGS)\" > .cbuild)
+
 # Control the build verbosity
 # `make V=1` is equal to `make VERBOSE=1`
 ifeq ("$(origin V)", "command line")
@@ -62,7 +64,7 @@ nqueen: sample/nqueen.c $(TARGET)
 
 .PHONY: clean check
 clean:
-	$(RM) $(TARGET) $(TESTS) $(OBJS) $(deps)
+	$(RM) $(TARGET) $(TESTS) $(OBJS) $(deps) .cbuild
 	$(RM) sample/*.o sample/nqueen.s sample/nqueen
 
 -include $(deps)

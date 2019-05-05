@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+eval `cat .cbuild`
+
 function compile {
     echo "$1" > /dev/stderr
     echo "$1" | ./mzcc > tmp.s || echo "Failed to compile $1"
@@ -7,7 +9,7 @@ function compile {
         echo "Failed to compile $1"
         exit
     fi
-    gcc -no-pie -o tmp.out tmp.s
+    $(CBUILD) -o tmp.out tmp.s
     if [ $? -ne 0 ]; then
         echo "GCC failed: $1"
         exit
