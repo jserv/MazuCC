@@ -6,3 +6,4 @@ nqueen.s
 nqueen
 *.bin
 *.dSYM
+.cbuild
