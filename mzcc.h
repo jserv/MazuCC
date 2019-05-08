@@ -171,22 +171,22 @@ extern Token *peek_token(void);
 extern Token *read_token(void);
 
 #define get_priv(tok, type)                                         \
-({                                                                  \
+    ({                                                              \
         assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
         ((type) tok->priv);                                         \
-})
+    })
 
 #define get_ttype(tok)                                              \
-({                                                                  \
+    ({                                                              \
         assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
         (tok->type);                                                \
-})
+    })
 
-#define get_token(tok, ttype, priv_type)                            \
-({                                                                  \
-        assert(get_ttype(tok) == ttype);                            \
-        get_priv(tok, priv_type);                                   \
-})
+#define get_token(tok, ttype, priv_type) \
+    ({                                   \
+        assert(get_ttype(tok) == ttype); \
+        get_priv(tok, priv_type);        \
+    })
 
 #define get_char(tok) get_token(tok, TTYPE_CHAR, char)
 #define get_strtok(tok) get_token(tok, TTYPE_STRING, char *)

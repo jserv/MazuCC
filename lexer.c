@@ -5,9 +5,9 @@
 
 #define make_strtok(x) make_token(TTYPE_STRING, (uintptr_t) get_cstring(x))
 #define make_ident(x) make_token(TTYPE_IDENT, (uintptr_t) get_cstring(x))
-#define make_punct(x) make_token(TTYPE_PUNCT, (uintptr_t) (x))
-#define make_number(x) make_token(TTYPE_NUMBER, (uintptr_t) (x))
-#define make_char(x) make_token(TTYPE_CHAR, (uintptr_t) (x))
+#define make_punct(x) make_token(TTYPE_PUNCT, (uintptr_t)(x))
+#define make_number(x) make_token(TTYPE_NUMBER, (uintptr_t)(x))
+#define make_char(x) make_token(TTYPE_CHAR, (uintptr_t)(x))
 
 static Token *ungotten = NULL;
 
