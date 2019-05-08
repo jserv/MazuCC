@@ -173,8 +173,6 @@ static Token *read_token_int(void)
     case ']':
     case '{':
     case '}':
-    case '<':
-    case '>':
     case '!':
     case '?':
     case ':':
@@ -195,6 +193,10 @@ static Token *read_token_int(void)
         return read_rep('&', '&', PUNCT_LOGAND);
     case '|':
         return read_rep('|', '|', PUNCT_LOGOR);
+    case '<':
+        return read_rep('<', '<', PUNCT_LSHIFT);
+    case '>':
+        return read_rep('>', '>', PUNCT_RSHIFT);
     case '"':
         return read_string();
     case '\'':
