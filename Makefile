@@ -54,7 +54,8 @@ tests/%.s: tests/%.c $(TARGET)
 	./mzcc < $< > $@
 
 tests/%.bin: tests/%.s $(TARGET)
-	$(CC) $(CFLAGS) -o $@ $<
+	$(VECHO) "  CC\t$@\n"
+	$(Q)$(CC) $(CFLAGS) -o $@ $<
 
 nqueen: sample/nqueen.c $(TARGET)
 	$(VECHO) "  MazuCC\t$<\n"
