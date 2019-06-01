@@ -42,6 +42,13 @@ int t5()
     expect(65, *s);
 }
 
+int t6()
+{
+    void *x = 1;
+    x = x + 3;
+    expect(4, x);
+}
+
 int main()
 {
     t1();
@@ -49,6 +56,7 @@ int main()
     t3();
     t4();
     t5();
+    t6();
 
     return 0;
 }
