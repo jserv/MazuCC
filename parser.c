@@ -19,7 +19,7 @@ static Dict *struct_defs = &EMPTY_DICT;
 static Dict *union_defs = &EMPTY_DICT;
 static List *localvars = NULL;
 
-static Ctype *ctype_void = &(Ctype){CTYPE_VOID, 1, NULL};
+static Ctype *ctype_void = &(Ctype){CTYPE_VOID, 0, NULL};
 static Ctype *ctype_int = &(Ctype){CTYPE_INT, 4, NULL};
 static Ctype *ctype_long = &(Ctype){CTYPE_LONG, 8, NULL};
 static Ctype *ctype_char = &(Ctype){CTYPE_CHAR, 1, NULL};
