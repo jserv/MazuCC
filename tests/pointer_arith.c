@@ -33,9 +33,18 @@ int t3()
     expect(105, *t);
 }
 
+int t4()
+{
+    char *s = "abcdefghi";
+    void *x = s;
+    char *t = x + 1;
+    expect(105, *t);
+}
+
 int main()
 {
     t1();
     t2();
     t3();
+    t4();
 }

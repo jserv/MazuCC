@@ -19,6 +19,7 @@ static Dict *struct_defs = &EMPTY_DICT;
 static Dict *union_defs = &EMPTY_DICT;
 static List *localvars = NULL;
 
+static Ctype *ctype_void = &(Ctype){CTYPE_VOID, 0, NULL};
 static Ctype *ctype_int = &(Ctype){CTYPE_INT, 4, NULL};
 static Ctype *ctype_long = &(Ctype){CTYPE_LONG, 8, NULL};
 static Ctype *ctype_char = &(Ctype){CTYPE_CHAR, 1, NULL};
@@ -593,6 +594,9 @@ static Ast *read_unary_expr(void)
         Ctype *ctype = convert_array(operand->ctype);
         if (ctype->type != CTYPE_PTR)
             error("pointer type expected, but got %s", ast_to_string(operand));
+        if (ctype->ptr == ctype_void)
+            error("pointer to void can not be dereferenced, but got %s",
+                  ast_to_string(operand));
         return ast_uop(AST_DEREF, operand->ctype->ptr, operand);
     }
     unget_token(tok);
@@ -688,6 +692,8 @@ static Ctype *get_ctype(Token *tok)
     if (get_ttype(tok) != TTYPE_IDENT)
         return NULL;
     ident = get_ident(tok);
+    if (!strcmp(ident, "void"))
+        return ctype_void;
     if (!strcmp(ident, "int"))
         return ctype_int;
     if (!strcmp(ident, "long"))
@@ -890,6 +896,8 @@ static Ast *read_decl(void)
 {
     Token *varname;
     Ctype *ctype = read_decl_int(&varname);
+    if (ctype == ctype_void)
+        error("Storage size of '%s' is not known", token_to_string(varname));
     Ast *var = ast_lvar(ctype, get_ident(varname));
     return read_decl_init(var);
 }
@@ -1044,14 +1052,16 @@ static Ast *read_decl_or_func_def(void)
     if (get_ttype(name) != TTYPE_IDENT)
         error("Identifier expected, but got %s", token_to_string(name));
     ident = get_ident(name);
-    ctype = read_array_dimensions(ctype);
     tok = peek_token();
+    if (is_punct(tok, '('))
+        return read_func_def(ctype, ident);
+    if (ctype == ctype_void)
+        error("Storage size of '%s' is not known", token_to_string(name));
+    ctype = read_array_dimensions(ctype);
     if (is_punct(tok, '=') || ctype->type == CTYPE_ARRAY) {
         Ast *var = ast_gvar(ctype, ident, false);
         return read_decl_init(var);
     }
-    if (is_punct(tok, '('))
-        return read_func_def(ctype, ident);
     if (is_punct(tok, ';')) {
         read_token();
         Ast *var = ast_gvar(ctype, ident, false);
