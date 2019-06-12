@@ -8,6 +8,7 @@
 #include "util.h"
 
 enum TokenType {
+    TTYPE_NULL,
     TTYPE_IDENT,
     TTYPE_PUNCT,
     TTYPE_NUMBER,
@@ -160,26 +161,26 @@ typedef struct __Ast {
 } Ast;
 
 /* verbose.c */
-extern char *token_to_string(Token *tok);
+extern char *token_to_string(const Token tok);
 extern char *ast_to_string(Ast *ast);
 extern char *ctype_to_string(Ctype *ctype);
 
 /* lexer.c */
-extern bool is_punct(Token *tok, int c);
-extern void unget_token(Token *tok);
-extern Token *peek_token(void);
-extern Token *read_token(void);
+extern bool is_punct(const Token tok, int c);
+extern void unget_token(const Token tok);
+extern Token peek_token(void);
+extern Token read_token(void);
 
-#define get_priv(tok, type)                                         \
-    ({                                                              \
-        assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
-        ((type) tok->priv);                                         \
+#define get_priv(tok, type)                                       \
+    ({                                                            \
+        assert(__builtin_types_compatible_p(typeof(tok), Token)); \
+        ((type) tok.priv);                                        \
     })
 
-#define get_ttype(tok)                                              \
-    ({                                                              \
-        assert(__builtin_types_compatible_p(typeof(tok), Token *)); \
-        (tok->type);                                                \
+#define get_ttype(tok)                                            \
+    ({                                                            \
+        assert(__builtin_types_compatible_p(typeof(tok), Token)); \
+        (tok.type);                                               \
     })
 
 #define get_token(tok, ttype, priv_type) \

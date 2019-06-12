@@ -26,15 +26,16 @@ static inline String *make_string(void)
 static inline void realloc_body(String *s)
 {
     int newsize = s->nalloc * 2;
-    char *body = malloc(newsize);
-    strcpy(body, s->body);
+    char *body = realloc(s->body, newsize);
     s->body = body;
     s->nalloc = newsize;
 }
 
 static inline char *get_cstring(String *s)
 {
-    return s->body;
+    char *ret = s->body;
+    free(s);
+    return ret;
 }
 
 static inline void string_append(String *s, char c)

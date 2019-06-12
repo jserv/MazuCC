@@ -210,12 +210,13 @@ char *ast_to_string(Ast *ast)
     return get_cstring(s);
 }
 
-char *token_to_string(Token *tok)
+char *token_to_string(const Token tok)
 {
-    if (!tok)
+    enum TokenType ttype = get_ttype(tok);
+    if (ttype == TTYPE_NULL)
         return "(null)";
     String *s = make_string();
-    switch (get_ttype(tok)) {
+    switch (ttype) {
     case TTYPE_IDENT:
         return get_ident(tok);
     case TTYPE_PUNCT:
@@ -232,7 +233,8 @@ char *token_to_string(Token *tok)
     case TTYPE_STRING:
         string_appendf(s, "\"%s\"", get_strtok(tok));
         return get_cstring(s);
+    default:
+        error("internal error: unknown token type: %d", get_ttype(tok));
     }
-    error("internal error: unknown token type: %d", get_ttype(tok));
     return NULL; /* non-reachable */
 }

@@ -3,20 +3,22 @@
 #include <stdlib.h>
 #include "mzcc.h"
 
+#define make_null(x) make_token(TTYPE_NULL, (uintptr_t) 0)
 #define make_strtok(x) make_token(TTYPE_STRING, (uintptr_t) get_cstring(x))
 #define make_ident(x) make_token(TTYPE_IDENT, (uintptr_t) get_cstring(x))
 #define make_punct(x) make_token(TTYPE_PUNCT, (uintptr_t)(x))
 #define make_number(x) make_token(TTYPE_NUMBER, (uintptr_t)(x))
 #define make_char(x) make_token(TTYPE_CHAR, (uintptr_t)(x))
 
-static Token *ungotten = NULL;
+static bool ungotten = false;
+static Token ungotten_buf = {0};
 
-static Token *make_token(enum TokenType type, uintptr_t data)
+static Token make_token(enum TokenType type, uintptr_t data)
 {
-    Token *r = malloc(sizeof(Token));
-    r->type = type;
-    r->priv = data;
-    return r;
+    return (Token){
+        .type = type,
+        .priv = data,
+    };
 }
 
 static int getc_nonspace(void)
@@ -30,7 +32,7 @@ static int getc_nonspace(void)
     return EOF;
 }
 
-static Token *read_number(char c)
+static Token read_number(char c)
 {
     String *s = make_string();
     string_append(s, c);
@@ -44,7 +46,7 @@ static Token *read_number(char c)
     }
 }
 
-static Token *read_char(void)
+static Token read_char(void)
 {
     char c = getc(stdin);
     if (c == EOF)
@@ -62,10 +64,10 @@ static Token *read_char(void)
     return make_char(c);
 err:
     error("Unterminated char");
-    return NULL; /* non-reachable */
+    return make_null(); /* non-reachable */
 }
 
-static Token *read_string(void)
+static Token read_string(void)
 {
     String *s = make_string();
     while (1) {
@@ -93,7 +95,7 @@ static Token *read_string(void)
     return make_strtok(s);
 }
 
-static Token *read_ident(char c)
+static Token read_ident(char c)
 {
     String *s = make_string();
     string_append(s, c);
@@ -131,7 +133,7 @@ static void skip_block_comment(void)
     }
 }
 
-static Token *read_rep(int expect, int t1, int t2)
+static Token read_rep(int expect, int t1, int t2)
 {
     int c = getc(stdin);
     if (c == expect)
@@ -140,7 +142,7 @@ static Token *read_rep(int expect, int t1, int t2)
     return make_punct(t1);
 }
 
-static Token *read_token_int(void)
+static Token read_token_int(void)
 {
     int c = getc_nonspace();
     switch (c) {
@@ -202,40 +204,40 @@ static Token *read_token_int(void)
     case '\'':
         return read_char();
     case EOF:
-        return NULL;
+        return make_null();
     default:
         error("Unexpected character: '%c'", c);
-        return NULL; /* non-reachable */
+        return make_null(); /* non-reachable */
     }
 }
 
-bool is_punct(Token *tok, int c)
+bool is_punct(const Token tok, int c)
 {
-    return tok && (get_ttype(tok) == TTYPE_PUNCT) && (get_punct(tok) == c);
+    return (get_ttype(tok) == TTYPE_PUNCT) && (get_punct(tok) == c);
 }
 
-void unget_token(Token *tok)
+void unget_token(const Token tok)
 {
-    if (!tok)
+    if (get_ttype(tok) == TTYPE_NULL)
         return;
     if (ungotten)
         error("Push back buffer is already full");
-    ungotten = tok;
+    ungotten = true;
+    ungotten_buf = make_token(tok.type, tok.priv);
 }
 
-Token *peek_token(void)
+Token peek_token(void)
 {
-    Token *tok = read_token();
+    Token tok = read_token();
     unget_token(tok);
     return tok;
 }
 
-Token *read_token(void)
+Token read_token(void)
 {
     if (ungotten) {
-        Token *tok = ungotten;
-        ungotten = NULL;
-        return tok;
+        ungotten = false;
+        return make_token(ungotten_buf.type, ungotten_buf.priv);
     }
     return read_token_int();
 }
