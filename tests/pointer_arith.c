@@ -38,7 +38,7 @@ int t4()
     char *s = "abcdefghi";
     void *x = s;
     char *t = x + 1;
-    expect(105, *t);
+    expect(98, *t);
 }
 
 int main()
