@@ -5,11 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "list.h"
 
 typedef struct {
     char *body;
     int nalloc, len;
 } String;
+
+static List *cstrings = &EMPTY_LIST;
 
 #define INIT_SIZE 8
 
@@ -17,6 +20,7 @@ static inline String make_string(void)
 {
     char *body = malloc(INIT_SIZE);
     body[0] = '\0';
+    list_push(cstrings, body);
     return (String){
         .body = body,
         .nalloc = INIT_SIZE,
