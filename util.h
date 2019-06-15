@@ -18,8 +18,7 @@ static List *cstrings = &EMPTY_LIST;
 
 static inline String make_string(void)
 {
-    char *body = malloc(INIT_SIZE);
-    body[0] = '\0';
+    char *body = calloc(1, INIT_SIZE);
     list_push(cstrings, body);
     return (String){
         .body = body,
