@@ -34,15 +34,15 @@ static int getc_nonspace(void)
 
 static Token read_number(char c)
 {
-    String *s = make_string();
-    string_append(s, c);
+    String s = make_string();
+    string_append(&s, c);
     while (1) {
         int c = getc(stdin);
         if (!isdigit(c) && !isalpha(c) && c != '.') {
             ungetc(c, stdin);
             return make_number(get_cstring(s));
         }
-        string_append(s, c);
+        string_append(&s, c);
     }
 }
 
@@ -69,7 +69,7 @@ err:
 
 static Token read_string(void)
 {
-    String *s = make_string();
+    String s = make_string();
     while (1) {
         int c = getc(stdin);
         if (c == EOF)
@@ -90,19 +90,19 @@ static Token read_string(void)
                 error("Unknown quote: %c", c);
             }
         }
-        string_append(s, c);
+        string_append(&s, c);
     }
     return make_strtok(s);
 }
 
 static Token read_ident(char c)
 {
-    String *s = make_string();
-    string_append(s, c);
+    String s = make_string();
+    string_append(&s, c);
     while (1) {
         int c2 = getc(stdin);
         if (isalnum(c2) || c2 == '_') {
-            string_append(s, c2);
+            string_append(&s, c2);
         } else {
             ungetc(c2, stdin);
             return make_ident(s);

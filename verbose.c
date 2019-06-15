@@ -18,21 +18,21 @@ char *ctype_to_string(Ctype *ctype)
     case CTYPE_DOUBLE:
         return "double";
     case CTYPE_PTR: {
-        String *s = make_string();
-        string_appendf(s, "*%s", ctype_to_string(ctype->ptr));
+        String s = make_string();
+        string_appendf(&s, "*%s", ctype_to_string(ctype->ptr));
         return get_cstring(s);
     }
     case CTYPE_ARRAY: {
-        String *s = make_string();
-        string_appendf(s, "[%d]%s", ctype->len, ctype_to_string(ctype->ptr));
+        String s = make_string();
+        string_appendf(&s, "[%d]%s", ctype->len, ctype_to_string(ctype->ptr));
         return get_cstring(s);
     }
     case CTYPE_STRUCT: {
-        String *s = make_string();
-        string_appendf(s, "(struct");
-        for (Iter *i = list_iter(dict_values(ctype->fields)); !iter_end(i);)
-            string_appendf(s, " (%s)", ctype_to_string(iter_next(i)));
-        string_appendf(s, ")");
+        String s = make_string();
+        string_appendf(&s, "(struct");
+        for (Iter i = list_iter(dict_values(ctype->fields)); !iter_end(i);)
+            string_appendf(&s, " (%s)", ctype_to_string(iter_next(&i)));
+        string_appendf(&s, ")");
         return get_cstring(s);
     }
     default:
@@ -92,8 +92,8 @@ static void ast_to_string_int(String *buf, Ast *ast)
         break;
     case AST_FUNCALL: {
         string_appendf(buf, "(%s)%s(", ctype_to_string(ast->ctype), ast->fname);
-        for (Iter *i = list_iter(ast->args); !iter_end(i);) {
-            string_appendf(buf, "%s", ast_to_string(iter_next(i)));
+        for (Iter i = list_iter(ast->args); !iter_end(i);) {
+            string_appendf(buf, "%s", ast_to_string(iter_next(&i)));
             if (!iter_end(i))
                 string_appendf(buf, ",");
         }
@@ -102,8 +102,8 @@ static void ast_to_string_int(String *buf, Ast *ast)
     }
     case AST_FUNC: {
         string_appendf(buf, "(%s)%s(", ctype_to_string(ast->ctype), ast->fname);
-        for (Iter *i = list_iter(ast->params); !iter_end(i);) {
-            Ast *param = iter_next(i);
+        for (Iter i = list_iter(ast->params); !iter_end(i);) {
+            Ast *param = iter_next(&i);
             string_appendf(buf, "%s %s", ctype_to_string(param->ctype),
                            ast_to_string(param));
             if (!iter_end(i))
@@ -123,8 +123,8 @@ static void ast_to_string_int(String *buf, Ast *ast)
         break;
     case AST_ARRAY_INIT:
         string_appendf(buf, "{");
-        for (Iter *i = list_iter(ast->arrayinit); !iter_end(i);) {
-            ast_to_string_int(buf, iter_next(i));
+        for (Iter i = list_iter(ast->arrayinit); !iter_end(i);) {
+            ast_to_string_int(buf, iter_next(&i));
             if (!iter_end(i))
                 string_appendf(buf, ",");
         }
@@ -152,8 +152,8 @@ static void ast_to_string_int(String *buf, Ast *ast)
         break;
     case AST_COMPOUND_STMT: {
         string_appendf(buf, "{");
-        for (Iter *i = list_iter(ast->stmts); !iter_end(i);) {
-            ast_to_string_int(buf, iter_next(i));
+        for (Iter i = list_iter(ast->stmts); !iter_end(i);) {
+            ast_to_string_int(buf, iter_next(&i));
             string_appendf(buf, ";");
         }
         string_appendf(buf, "}");
@@ -205,8 +205,8 @@ static void ast_to_string_int(String *buf, Ast *ast)
 
 char *ast_to_string(Ast *ast)
 {
-    String *s = make_string();
-    ast_to_string_int(s, ast);
+    String s = make_string();
+    ast_to_string_int(&s, ast);
     return get_cstring(s);
 }
 
@@ -215,26 +215,27 @@ char *token_to_string(const Token tok)
     enum TokenType ttype = get_ttype(tok);
     if (ttype == TTYPE_NULL)
         return "(null)";
-    String *s = make_string();
+    String s = make_string();
     switch (ttype) {
+    case TTYPE_NULL:
+        error("internal error: unknown token type: %d", get_ttype(tok));
     case TTYPE_IDENT:
         return get_ident(tok);
     case TTYPE_PUNCT:
         if (is_punct(tok, PUNCT_EQ))
-            string_appendf(s, "==");
+            string_appendf(&s, "==");
         else
-            string_appendf(s, "%c", get_punct(tok));
+            string_appendf(&s, "%c", get_punct(tok));
         return get_cstring(s);
     case TTYPE_CHAR:
-        string_append(s, get_char(tok));
+        string_append(&s, get_char(tok));
         return get_cstring(s);
     case TTYPE_NUMBER:
         return get_number(tok);
     case TTYPE_STRING:
-        string_appendf(s, "\"%s\"", get_strtok(tok));
+        string_appendf(&s, "\"%s\"", get_strtok(tok));
         return get_cstring(s);
-    default:
-        error("internal error: unknown token type: %d", get_ttype(tok));
     }
+    error("internal error: unknown token type: %d", get_ttype(tok));
     return NULL; /* non-reachable */
 }

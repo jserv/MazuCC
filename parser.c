@@ -84,8 +84,8 @@ static Ast *ast_double(double val)
 
 char *make_label(void)
 {
-    String *s = make_string();
-    string_appendf(s, ".L%d", labelseq++);
+    String s = make_string();
+    string_appendf(&s, ".L%d", labelseq++);
     return get_cstring(s);
 }
 
@@ -766,8 +766,8 @@ static Ctype *read_union_def(void)
         return ctype;
     Dict *fields = read_struct_union_fields();
     int maxsize = 0;
-    for (Iter *i = list_iter(dict_values(fields)); !iter_end(i);) {
-        Ctype *fieldtype = iter_next(i);
+    for (Iter i = list_iter(dict_values(fields)); !iter_end(i);) {
+        Ctype *fieldtype = iter_next(&i);
         maxsize = (maxsize < fieldtype->size) ? fieldtype->size : maxsize;
     }
     Ctype *r = make_struct_type(fields, maxsize);
@@ -784,8 +784,8 @@ static Ctype *read_struct_def(void)
         return ctype;
     Dict *fields = read_struct_union_fields();
     int offset = 0;
-    for (Iter *i = list_iter(dict_values(fields)); !iter_end(i);) {
-        Ctype *fieldtype = iter_next(i);
+    for (Iter i = list_iter(dict_values(fields)); !iter_end(i);) {
+        Ctype *fieldtype = iter_next(&i);
         int size = (fieldtype->size < MAX_ALIGN) ? fieldtype->size : MAX_ALIGN;
         if (offset % size != 0)
             offset += size - offset % size;
