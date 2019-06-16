@@ -54,12 +54,14 @@ static inline void *list_pop(List *list)
 {
     if (!list->head)
         return NULL;
-    void *r = list->tail->elem;
-    list->tail = list->tail->prev;
+    ListNode *tail = list->tail;
+    void *r = tail->elem;
+    list->tail = tail->prev;
     if (list->tail)
         list->tail->next = NULL;
     else
         list->head = NULL;
+    free(tail);
     return r;
 }
 
