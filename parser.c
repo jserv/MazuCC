@@ -1037,7 +1037,8 @@ static Ast *read_func_def(Ctype *rettype, char *fname)
     localvars = make_list();
     Ast *body = read_compound_stmt();
     Ast *r = ast_func(rettype, fname, params, body, localvars);
-    localenv = NULL;
+    localenv = dict_parent(localenv);
+    localenv = dict_parent(localenv);
     localvars = NULL;
     return r;
 }
@@ -1081,5 +1082,6 @@ List *read_toplevels(void)
             return r;
         list_push(r, ast);
     }
+    list_free(globalenv->list, free);
     return r;
 }
