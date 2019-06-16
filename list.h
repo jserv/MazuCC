@@ -109,17 +109,13 @@ static inline int list_len(List *list)
     return list->len;
 }
 
-static inline void iter_next_and_free(Iter *iter)
-{
-    ListNode *now = iter->ptr;
-    iter->ptr = now->next;
-    free(now->elem);
-    free(now);
-}
-
 static inline void list_free(List *list)
 {
-    for (Iter i = list_iter(list); !iter_end(i);)
-        iter_next_and_free(&i);
+    for (Iter i = list_iter(list); !iter_end(i);) {
+        ListNode *now = i.ptr;
+        i.ptr = now->next;
+        free(now->elem);
+        free(now);
+    }
 }
 #endif /* MAZUCC_LIST_H */
