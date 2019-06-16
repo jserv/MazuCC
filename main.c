@@ -10,12 +10,13 @@ int main(int argc, char **argv)
     if (!dump_ast)
         emit_data_section();
 
-    for (Iter *i = list_iter(toplevels); !iter_end(i);) {
-        Ast *v = iter_next(i);
+    for (Iter i = list_iter(toplevels); !iter_end(i);) {
+        Ast *v = iter_next(&i);
         if (dump_ast)
             printf("%s", ast_to_string(v));
         else
             emit_toplevel(v);
     }
+    list_free(cstrings);
     return 0;
 }

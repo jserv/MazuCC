@@ -75,16 +75,16 @@ static void list_unshift(List *list, void *elem)
     list->len++;
 }
 
-static inline Iter *list_iter(void *ptr)
+static inline Iter list_iter(void *ptr)
 {
-    Iter *r = malloc(sizeof(Iter));
-    r->ptr = ((List *) ptr)->head;
-    return r;
+    return (Iter){
+        .ptr = ((List *) ptr)->head,
+    };
 }
 
-static inline bool iter_end(Iter *iter)
+static inline bool iter_end(const Iter iter)
 {
-    return !iter->ptr;
+    return !iter.ptr;
 }
 
 static inline void *iter_next(Iter *iter)
@@ -99,8 +99,8 @@ static inline void *iter_next(Iter *iter)
 static inline List *list_reverse(List *list)
 {
     List *r = make_list();
-    for (Iter *i = list_iter(list); !iter_end(i);)
-        list_unshift(r, iter_next(i));
+    for (Iter i = list_iter(list); !iter_end(i);)
+        list_unshift(r, iter_next(&i));
     return r;
 }
 
@@ -109,4 +109,13 @@ static inline int list_len(List *list)
     return list->len;
 }
 
+static inline void list_free(List *list)
+{
+    for (Iter i = list_iter(list); !iter_end(i);) {
+        ListNode *now = i.ptr;
+        i.ptr = now->next;
+        free(now->elem);
+        free(now);
+    }
+}
 #endif /* MAZUCC_LIST_H */

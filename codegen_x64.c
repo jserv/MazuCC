@@ -27,11 +27,11 @@ static void pop_function(void *ignore UNUSED)
 
 static char *get_caller_list(void)
 {
-    String *s = make_string();
-    for (Iter *i = list_iter(functions); !iter_end(i);) {
-        string_appendf(s, "%s", iter_next(i));
+    String s = make_string();
+    for (Iter i = list_iter(functions); !iter_end(i);) {
+        string_appendf(&s, "%s", iter_next(&i));
         if (!iter_end(i))
-            string_appendf(s, " -> ");
+            string_appendf(&s, " -> ");
     }
     return get_cstring(s);
 }
@@ -468,15 +468,15 @@ static void emit_expr(Ast *ast)
     case AST_FUNCALL: {
         int ireg = 0;
         int xreg = 0;
-        for (Iter *i = list_iter(ast->args); !iter_end(i);) {
-            Ast *v = iter_next(i);
+        for (Iter i = list_iter(ast->args); !iter_end(i);) {
+            Ast *v = iter_next(&i);
             if (is_flotype(v->ctype))
                 push_xmm(xreg++);
             else
                 push(REGS[ireg++]);
         }
-        for (Iter *i = list_iter(ast->args); !iter_end(i);) {
-            Ast *v = iter_next(i);
+        for (Iter i = list_iter(ast->args); !iter_end(i);) {
+            Ast *v = iter_next(&i);
             emit_expr(v);
             if (is_flotype(v->ctype))
                 push_xmm(0);
@@ -485,8 +485,8 @@ static void emit_expr(Ast *ast)
         }
         int ir = ireg;
         int xr = xreg;
-        for (Iter *i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
-            Ast *v = iter_next(i);
+        for (Iter i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
+            Ast *v = iter_next(&i);
             if (is_flotype(v->ctype))
                 pop_xmm(--xr);
             else
@@ -502,8 +502,8 @@ static void emit_expr(Ast *ast)
 #endif
         if (stackpos % 16)
             emit("add $8, %%rsp");
-        for (Iter *i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
-            Ast *v = iter_next(i);
+        for (Iter i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
+            Ast *v = iter_next(&i);
             if (is_flotype(v->ctype))
                 pop_xmm(--xreg);
             else
@@ -516,9 +516,9 @@ static void emit_expr(Ast *ast)
             return;
         if (ast->declinit->type == AST_ARRAY_INIT) {
             int off = 0;
-            for (Iter *iter = list_iter(ast->declinit->arrayinit);
+            for (Iter iter = list_iter(ast->declinit->arrayinit);
                  !iter_end(iter);) {
-                emit_expr(iter_next(iter));
+                emit_expr(iter_next(&iter));
                 emit_lsave(ast->declvar->ctype->ptr, ast->declvar->loff + off);
                 off += ast->declvar->ctype->ptr->size;
             }
@@ -595,8 +595,8 @@ static void emit_expr(Ast *ast)
         emit("ret");
         break;
     case AST_COMPOUND_STMT:
-        for (Iter *i = list_iter(ast->stmts); !iter_end(i);) {
-            emit_expr(iter_next(i));
+        for (Iter i = list_iter(ast->stmts); !iter_end(i);) {
+            emit_expr(iter_next(&i));
             emit("#;");
         }
         break;
@@ -687,8 +687,8 @@ static void emit_data(Ast *v)
     emit_label(".global %s", v->declvar->varname);
     emit_label("%s:", v->declvar->varname);
     if (v->declinit->type == AST_ARRAY_INIT) {
-        for (Iter *iter = list_iter(v->declinit->arrayinit); !iter_end(iter);) {
-            emit_data_int(iter_next(iter));
+        for (Iter iter = list_iter(v->declinit->arrayinit); !iter_end(iter);) {
+            emit_data_int(iter_next(&iter));
         }
         return;
     }
@@ -715,13 +715,13 @@ void emit_data_section(void)
 {
     SAVE;
     emit(".data");
-    for (Iter *i = list_iter(strings); !iter_end(i);) {
-        Ast *v = iter_next(i);
+    for (Iter i = list_iter(strings); !iter_end(i);) {
+        Ast *v = iter_next(&i);
         emit_label("%s:", v->slabel);
         emit(".string \"%s\"", quote_cstring(v->sval));
     }
-    for (Iter *i = list_iter(flonums); !iter_end(i);) {
-        Ast *v = iter_next(i);
+    for (Iter i = list_iter(flonums); !iter_end(i);) {
+        Ast *v = iter_next(&i);
         char *label = make_label();
         v->flabel = label;
         emit_label("%s:", label);
@@ -752,8 +752,8 @@ static void emit_func_prologue(Ast *func)
     int off = 0;
     int ireg = 0;
     int xreg = 0;
-    for (Iter *i = list_iter(func->params); !iter_end(i);) {
-        Ast *v = iter_next(i);
+    for (Iter i = list_iter(func->params); !iter_end(i);) {
+        Ast *v = iter_next(&i);
         if (v->ctype->type == CTYPE_FLOAT) {
             emit("cvtpd2ps %%xmm%d, %%xmm%d", xreg, xreg);
             push_xmm(xreg++);
@@ -765,8 +765,8 @@ static void emit_func_prologue(Ast *func)
         off -= align(v->ctype->size, 8);
         v->loff = off;
     }
-    for (Iter *i = list_iter(func->localvars); !iter_end(i);) {
-        Ast *v = iter_next(i);
+    for (Iter i = list_iter(func->localvars); !iter_end(i);) {
+        Ast *v = iter_next(&i);
         off -= align(v->ctype->size, 8);
         v->loff = off;
     }

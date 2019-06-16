@@ -5,36 +5,39 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "list.h"
 
 typedef struct {
     char *body;
     int nalloc, len;
 } String;
 
+static List *cstrings = &EMPTY_LIST;
+
 #define INIT_SIZE 8
 
-static inline String *make_string(void)
+static inline String make_string(void)
 {
-    String *r = malloc(sizeof(String));
-    r->body = malloc(INIT_SIZE);
-    r->nalloc = INIT_SIZE;
-    r->len = 0;
-    r->body[0] = '\0';
-    return r;
+    char *body = calloc(1, INIT_SIZE);
+    list_push(cstrings, body);
+    return (String){
+        .body = body,
+        .nalloc = INIT_SIZE,
+        .len = 0,
+    };
 }
 
 static inline void realloc_body(String *s)
 {
     int newsize = s->nalloc * 2;
-    char *body = malloc(newsize);
-    strcpy(body, s->body);
+    char *body = realloc(s->body, newsize);
     s->body = body;
     s->nalloc = newsize;
 }
 
-static inline char *get_cstring(String *s)
+static inline char *get_cstring(const String s)
 {
-    return s->body;
+    return s.body;
 }
 
 static inline void string_append(String *s, char c)
@@ -83,14 +86,14 @@ static inline void errorf(char *file, int line, char *fmt, ...)
 
 static inline char *quote_cstring(char *p)
 {
-    String *s = make_string();
+    String s = make_string();
     for (; *p; p++) {
         if (*p == '\"' || *p == '\\')
-            string_appendf(s, "\\%c", *p);
+            string_appendf(&s, "\\%c", *p);
         else if (*p == '\n')
-            string_appendf(s, "\\n");
+            string_appendf(&s, "\\n");
         else
-            string_append(s, *p);
+            string_append(&s, *p);
     }
     return get_cstring(s);
 }
