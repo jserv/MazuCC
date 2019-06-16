@@ -18,10 +18,8 @@ static List *cstrings = &EMPTY_LIST;
 
 static inline String make_string(void)
 {
-    char *body = calloc(1, INIT_SIZE);
-    list_push(cstrings, body);
     return (String){
-        .body = body,
+        .body = calloc(1, INIT_SIZE),
         .nalloc = INIT_SIZE,
         .len = 0,
     };
@@ -37,7 +35,9 @@ static inline void realloc_body(String *s)
 
 static inline char *get_cstring(const String s)
 {
-    return s.body;
+    char *r = s.body;
+    list_push(cstrings, r);
+    return r;
 }
 
 static inline void string_append(String *s, char c)
