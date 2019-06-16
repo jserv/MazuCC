@@ -198,6 +198,7 @@ extern Token read_token(void);
 /* parser.c */
 extern List *strings;
 extern List *flonums;
+extern List *ctypes;
 extern char *make_label(void);
 extern List *read_toplevels(void);
 extern bool is_inttype(Ctype *ctype);

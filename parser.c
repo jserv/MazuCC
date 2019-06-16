@@ -10,6 +10,7 @@
 #define MAX_OP_PRIO 16
 #define MAX_ALIGN 16
 
+List *ctypes = &EMPTY_LIST;
 List *strings = &EMPTY_LIST;
 List *flonums = &EMPTY_LIST;
 
@@ -236,6 +237,7 @@ static Ctype *make_ptr_type(Ctype *ctype)
     r->type = CTYPE_PTR;
     r->ptr = ctype;
     r->size = 8;
+    list_push(ctypes, r);
     return r;
 }
 
@@ -246,6 +248,7 @@ static Ctype *make_array_type(Ctype *ctype, int len)
     r->ptr = ctype;
     r->size = (len < 0) ? -1 : ctype->size * len;
     r->len = len;
+    list_push(ctypes, r);
     return r;
 }
 
@@ -254,6 +257,7 @@ static Ctype *make_struct_field_type(Ctype *ctype, int offset)
     Ctype *r = malloc(sizeof(Ctype));
     memcpy(r, ctype, sizeof(Ctype));
     r->offset = offset;
+    list_push(ctypes, r);
     return r;
 }
 
@@ -263,6 +267,7 @@ static Ctype *make_struct_type(Dict *fields, int size)
     r->type = CTYPE_STRUCT;
     r->fields = fields;
     r->size = size;
+    list_push(ctypes, r);
     return r;
 }
 
