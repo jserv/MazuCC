@@ -111,13 +111,12 @@ static inline int list_len(List *list)
     return list->len;
 }
 
-static inline void list_free(List *list, void (*free_impl)(void *))
+static inline void list_free(List *list)
 {
     for (Iter i = list_iter(list); !iter_end(i);) {
         ListNode *now = i.ptr;
         i.ptr = now->next;
-        if (free_impl)
-            free(now->elem);
+        free(now->elem);
         free(now);
     }
 }

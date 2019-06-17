@@ -1082,6 +1082,6 @@ List *read_toplevels(void)
             return r;
         list_push(r, ast);
     }
-    list_free(globalenv->list, free);
+    list_free(globalenv->list);
     return r;
 }

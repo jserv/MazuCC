@@ -510,7 +510,11 @@ static void emit_expr(Ast *ast)
             else
                 pop(REGS[--ireg]);
         }
-        list_free(reverse, NULL);
+        for (Iter i = list_iter(reverse); !iter_end(i);) {
+            ListNode *now = i.ptr;
+            i.ptr = now->next;
+            free(now);
+        }
         free(reverse);
         break;
     }

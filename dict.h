@@ -66,7 +66,7 @@ static inline List *dict_values(Dict *dict)
 static inline void *dict_parent(Dict *dict)
 {
     void *r = dict->parent;
-    list_free(dict->list, free);
+    list_free(dict->list);
     free(dict->list);
     free(dict);
     return r;

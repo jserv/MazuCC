@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         else
             emit_toplevel(v);
     }
-    list_free(cstrings, free);
-    list_free(ctypes, free);
+    list_free(cstrings);
+    list_free(ctypes);
     return 0;
 }
