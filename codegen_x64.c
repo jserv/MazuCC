@@ -301,7 +301,7 @@ static void emit_comp(char *inst, Ast *ast)
 static void emit_binop_int_arith(Ast *ast)
 {
     SAVE;
-    char *op;
+    char *op = NULL;
     switch (ast->type) {
     case '+':
         op = "add";
@@ -732,8 +732,8 @@ void emit_data_section(void)
         char *label = make_label();
         v->flabel = label;
         emit_label("%s:", label);
-        emit(".long %d", ((int *) &v->fval)[0]);
-        emit(".long %d", ((int *) &v->fval)[1]);
+        emit(".long %d", v->lval[0]);
+        emit(".long %d", v->lval[1]);
     }
 }
 
