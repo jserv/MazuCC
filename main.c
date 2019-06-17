@@ -18,5 +18,6 @@ int main(int argc, char **argv)
             emit_toplevel(v);
     }
     list_free(cstrings);
+    list_free(ctypes);
     return 0;
 }

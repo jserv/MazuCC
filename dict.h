@@ -65,7 +65,11 @@ static inline List *dict_values(Dict *dict)
 
 static inline void *dict_parent(Dict *dict)
 {
-    return dict->parent;
+    void *r = dict->parent;
+    list_free(dict->list);
+    free(dict->list);
+    free(dict);
+    return r;
 }
 
 #endif /* MAZUCC_DICT_H */

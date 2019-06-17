@@ -485,7 +485,8 @@ static void emit_expr(Ast *ast)
         }
         int ir = ireg;
         int xr = xreg;
-        for (Iter i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
+        List *reverse = list_reverse(ast->args);
+        for (Iter i = list_iter(reverse); !iter_end(i);) {
             Ast *v = iter_next(&i);
             if (is_flotype(v->ctype))
                 pop_xmm(--xr);
@@ -502,13 +503,19 @@ static void emit_expr(Ast *ast)
 #endif
         if (stackpos % 16)
             emit("add $8, %%rsp");
-        for (Iter i = list_iter(list_reverse(ast->args)); !iter_end(i);) {
+        for (Iter i = list_iter(reverse); !iter_end(i);) {
             Ast *v = iter_next(&i);
             if (is_flotype(v->ctype))
                 pop_xmm(--xreg);
             else
                 pop(REGS[--ireg]);
         }
+        for (Iter i = list_iter(reverse); !iter_end(i);) {
+            ListNode *now = i.ptr;
+            i.ptr = now->next;
+            free(now);
+        }
+        free(reverse);
         break;
     }
     case AST_DECL: {
