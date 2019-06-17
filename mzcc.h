@@ -79,7 +79,10 @@ typedef struct __Ast {
 
         /* float or double */
         struct {
-            double fval;
+            union {
+                double fval;
+                int lval[2];
+            };
             char *flabel;
         };
 
