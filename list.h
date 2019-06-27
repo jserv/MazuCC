@@ -111,13 +111,16 @@ static inline int list_len(List *list)
     return list->len;
 }
 
+#define list_safe_next(node) (node) ? (node)->next : NULL
+#define list_for_each_safe(node, tmp, list)                           \
+    for ((node) = (list)->head, (tmp) = list_safe_next(node); (node); \
+         (node) = (tmp), (tmp) = list_safe_next(node))
 static inline void list_free(List *list)
 {
-    for (Iter i = list_iter(list); !iter_end(i);) {
-        ListNode *now = i.ptr;
-        i.ptr = now->next;
-        free(now->elem);
-        free(now);
+    ListNode *node, *tmp;
+    list_for_each_safe(node, tmp, list) {
+        free(node->elem);
+        free(node);
     }
 }
 #endif /* MAZUCC_LIST_H */
