@@ -111,14 +111,14 @@ static inline int list_len(List *list)
     return list->len;
 }
 
-#define list_safe_next(node) (node) ? (node)->next : NULL
+#define list_safe_next(node) ((node) ? (node)->next : NULL)
 #define list_for_each_safe(node, tmp, list)                           \
     for ((node) = (list)->head, (tmp) = list_safe_next(node); (node); \
          (node) = (tmp), (tmp) = list_safe_next(node))
 static inline void list_free(List *list)
 {
     ListNode *node, *tmp;
-    list_for_each_safe(node, tmp, list) {
+    list_for_each_safe (node, tmp, list) {
         free(node->elem);
         free(node);
     }

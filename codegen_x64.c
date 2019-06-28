@@ -511,7 +511,8 @@ static void emit_expr(Ast *ast)
                 pop(REGS[--ireg]);
         }
         ListNode *node, *tmp;
-        list_for_each_safe(node, tmp, reverse) free(node);
+        list_for_each_safe (node, tmp, reverse)
+            free(node);
         free(reverse);
         break;
     }
