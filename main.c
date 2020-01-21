@@ -5,54 +5,79 @@
 #include "mzcc.h"
 
 char *outfile = NULL, *infile = NULL;
-extern FILE *outputfp;
+extern FILE *outfp;
 bool dump_ast;
 
 static void usage()
 {
     fprintf(stdout,
+            "\n"
             "Usage : mzcc <input file>\n"
             "\n"
 
-            "-o filename     Output to the specified file\n"
-            "-dump-ast       Print Abstract Syntax Tree\n");
+            "  -o filename     Output to the specified file\n"
+            "  -dump-ast       Print Abstract Syntax Tree\n\n");
+}
+
+void print_usage_and_exit()
+{
+    usage();
     exit(1);
 }
-static void parseopt(int argc, char **argv)
+
+static void parse_args(int argc, char **argv)
 {
-    if (argc == 1) {
-        usage();
-    } else {
-        int opt;
-        while ((opt = getopt(argc, argv, "o:d:")) != -1) {
-            switch (opt) {
+    if (argc < 2) {
+        print_usage_and_exit();
+    }
+
+    while (true) {
+        argc--;
+        argv++;
+        if (argc == 0) {
+            break;
+        }
+
+        if ((*argv)[0] == '-') {
+            switch ((*argv)[1]) {
             case 'o':
-                outfile = optarg;
+                argc--;
+                argv++;
+                outfile = *argv;
                 break;
             case 'd':
-                dump_ast = true;
-                break;
+                if (!strcmp(*argv, "-dump-ast")) {
+                    dump_ast = true;
+                    break;
+                }
+            default:
+                print_usage_and_exit();
             }
+        } else {
+            if (infile) {
+                // The second non-option argument is not what we expect.
+                print_usage_and_exit();
+            }
+            infile = argv[0];
         }
     }
-    if (optind == argc - 1) {  // input file name is specified
-        infile = argv[optind];
-    }
 }
+
 static FILE *open_output_file()
 {
     FILE *tmp = stdout;
-    if (outfile != NULL && ((tmp = fopen(outfile, "w")) == NULL)) {
+    if (outfile && (tmp = fopen(outfile, "w"))) {
         printf("Can not open file %s\n", outfile);
         exit(1);
     }
     return tmp;
 }
+
 static FILE *open_input_file()
 {
-    if (infile == NULL) {
+    if (!infile) {
         printf("Input file is not specified\n\n");
-        usage();
+        print_usage_and_exit();
     }
 
     FILE *tmp = fopen(infile, "r");
@@ -62,11 +87,12 @@ static FILE *open_input_file()
     }
     return tmp;
 }
+
 int main(int argc, char **argv)
 {
-    parseopt(argc, argv);
+    parse_args(argc, argv);
     stdin = open_input_file();
-    outputfp = open_output_file();
+    outfp = open_output_file();
 
     List *toplevels = read_toplevels();
     if (!dump_ast)

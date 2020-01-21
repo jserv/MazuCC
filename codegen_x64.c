@@ -5,7 +5,7 @@
 static char *REGS[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 static int TAB = 8;
 static List *functions = &EMPTY_LIST;
-FILE *outputfp;
+FILE *outfp;
 static int stackpos;
 
 static void emit_expr(Ast *ast);
@@ -40,14 +40,14 @@ static void emitf(int line, char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    int col = vfprintf(outputfp, fmt, args);
+    int col = vfprintf(outfp, fmt, args);
     va_end(args);
 
     for (char *p = fmt; *p; p++)
         if (*p == '\t')
             col += TAB - 1;
     int space = (28 - col) > 0 ? (30 - col) : 2;
-    fprintf(outputfp, "%*c %s:%d\n", space, '#', get_caller_list(), line);
+    fprintf(outfp, "%*c %s:%d\n", space, '#', get_caller_list(), line);
 }
 
 static char *get_int_reg(Ctype *ctype, char r)
