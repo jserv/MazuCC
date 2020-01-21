@@ -12,11 +12,12 @@ static void usage()
 {
     fprintf(stdout,
             "\n"
-            "Usage : mzcc <input file>\n"
+            "Usage : mzcc [ input file | - ]\n"
             "\n"
 
-            "  -o filename     Output to the specified file\n"
-            "  -dump-ast       Print Abstract Syntax Tree\n\n");
+            "  -o filename            Output to the specified file\n"
+            "  -dump-ast              Print Abstract Syntax Tree\n"
+            "  [ input file | - ]     Specifying a file or use standard input\n\n");
 }
 
 void print_usage_and_exit()
@@ -34,12 +35,15 @@ static void parse_args(int argc, char **argv)
     while (true) {
         argc--;
         argv++;
-        if (argc == 0) {
+        if (!argc) {
             break;
         }
 
         if ((*argv)[0] == '-') {
             switch ((*argv)[1]) {
+            case '\0':
+                infile = "/dev/stdin";
+                break;
             case 'o':
                 argc--;
                 argv++;
@@ -66,7 +70,7 @@ static void parse_args(int argc, char **argv)
 static FILE *open_output_file()
 {
     FILE *tmp = stdout;
-    if (outfile && (tmp = fopen(outfile, "w"))) {
+    if (outfile && !(tmp = fopen(outfile, "w"))) {
         printf("Can not open file %s\n", outfile);
         exit(1);
     }
