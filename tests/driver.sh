@@ -24,7 +24,7 @@ function assert_equal {
 }
 
 function test_astf {
-    result="$(echo "$2" | ./mzcc --dump-ast)"
+    result="$(echo "$2" | ./mzcc --dump-ast -)"
     if [ $? -ne 0 ]; then
         echo "Failed to compile $2"
         exit
