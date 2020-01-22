@@ -21,13 +21,20 @@ MazuCC is known to work on both GNU/Linux and macOS.
 
 Use MazuCC to compile C source:
 ```shell
-$ ./mzcc < sample/nqueen.c
+$ ./mzcc  sample/nqueen.c
 ```
+
+Alternatively, MazuCC accepts the stream from standard input. The equivalent
+ form for the above command is:
+
+ ```shell
+ cat sample/nqueen.c | ./mzcc -
+ ```
 
 You will get the generated x86_64 assembly in AT&T syntax. The output can be
 assembled and linked into a valid executable:
 ```shell
-$ ./mzcc < sample/nqueen.c > sample/nqueen.s
+$ ./mzcc -o sample/nqueen.s sample/nqueen.c 
 $ gcc -no-pie -o sample/nqueen sample/nqueen.s
 ```
 
@@ -48,7 +55,7 @@ Q . . . . . . .
 
 Alternatively, you can dump internal abstract syntax tree:
 ```shell
-echo 'struct {int x; char y; struct { int t; } z; } a;' | ./mzcc --dump-ast
+echo 'struct {int x; char y; struct { int t; } z; } a;' | ./mzcc --dump-ast -
 ```
 
 The expected output in S-expression form:

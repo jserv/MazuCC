@@ -51,7 +51,7 @@ check: nqueen $(TESTS)
 	tests/driver.sh
 
 tests/%.s: tests/%.c $(TARGET)
-	./mzcc < $< > $@
+	./mzcc -o $@ $<
 
 tests/%.bin: tests/%.s $(TARGET)
 	$(VECHO) "  CC\t$@\n"
@@ -59,7 +59,7 @@ tests/%.bin: tests/%.s $(TARGET)
 
 nqueen: sample/nqueen.c $(TARGET)
 	$(VECHO) "  MazuCC\t$<\n"
-	$(Q)./mzcc < $< > ${<:.c=.s}
+	$(Q)./mzcc -o ${<:.c=.s} $<
 	$(VECHO) "  AS+LD\t\t$@\n"
 	$(Q)$(CC) $(CFLAGS) -o sample/nqueen sample/nqueen.s
 
