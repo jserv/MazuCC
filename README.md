@@ -34,7 +34,7 @@ Alternatively, MazuCC accepts the stream from standard input. The equivalent
 You will get the generated x86_64 assembly in AT&T syntax. The output can be
 assembled and linked into a valid executable:
 ```shell
-$ ./mzcc -o sample/nqueen.s sample/nqueen.c 
+$ ./mzcc -o sample/nqueen.s sample/nqueen.c
 $ gcc -no-pie -o sample/nqueen sample/nqueen.s
 ```
 

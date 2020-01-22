@@ -1,23 +1,22 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include "mzcc.h"
 
-char *outfile = NULL, *infile = NULL;
+static char *outfile = NULL, *infile = NULL;
 extern FILE *outfp;
-bool dump_ast;
+static bool dump_ast;
 
 static void usage()
 {
-    fprintf(stdout,
-            "\n"
-            "Usage : mzcc [ input file | - ]\n"
-            "\n"
-
-            "  -o filename            Output to the specified file\n"
-            "  -dump-ast              Print Abstract Syntax Tree\n"
-            "  [ input file | - ]     Specifying a file or use standard input\n\n");
+    fprintf(
+        stdout,
+        "\n"
+        "Usage : mzcc [ input file | - ]\n"
+        "\n"
+        "  -o filename            Output to the specified file\n"
+        "  --dump-ast             Print Abstract Syntax Tree\n"
+        "  [ input file | - ]     Specifying a file or use standard input\n\n");
 }
 
 void print_usage_and_exit()
@@ -49,8 +48,8 @@ static void parse_args(int argc, char **argv)
                 argv++;
                 outfile = *argv;
                 break;
-            case 'd':
-                if (!strcmp(*argv, "-dump-ast")) {
+            case '-':
+                if (!strcmp(*argv, "--dump-ast")) {
                     dump_ast = true;
                     break;
                 }
@@ -67,36 +66,32 @@ static void parse_args(int argc, char **argv)
     }
 }
 
-static FILE *open_output_file()
+static void open_output_file()
 {
-    FILE *tmp = stdout;
-    if (outfile && !(tmp = fopen(outfile, "w"))) {
+    if (outfile && !(outfp = fopen(outfile, "w"))) {
         printf("Can not open file %s\n", outfile);
         exit(1);
     }
-    return tmp;
 }
 
-static FILE *open_input_file()
+static void open_input_file()
 {
     if (!infile) {
         printf("Input file is not specified\n\n");
         print_usage_and_exit();
     }
 
-    FILE *tmp = fopen(infile, "r");
-    if (tmp == NULL) {
+    if (!freopen(infile, "r", stdin)) {
         printf("Can not open file %s\n", infile);
         exit(1);
     }
-    return tmp;
 }
 
 int main(int argc, char **argv)
 {
     parse_args(argc, argv);
-    stdin = open_input_file();
-    outfp = open_output_file();
+    open_input_file();
+    open_output_file();
 
     List *toplevels = read_toplevels();
     if (!dump_ast)
