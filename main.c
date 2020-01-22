@@ -9,14 +9,11 @@ static bool dump_ast;
 
 static void usage()
 {
-    fprintf(
-        stdout,
-        "\n"
-        "Usage : mzcc [ input file | - ]\n"
-        "\n"
-        "  -o filename            Output to the specified file\n"
-        "  --dump-ast             Print Abstract Syntax Tree\n"
-        "  [ input file | - ]     Specifying a file or use standard input\n\n");
+    fprintf(stdout,
+            "mzcc [options] filename\n"
+            "OPTIONS\n"
+            "  -o filename            Write output to the specified file.\n"
+            "  --dump-ast             Dump abstract syntax tree(AST)\n");
 }
 
 void print_usage_and_exit()

@@ -5,6 +5,8 @@
 static char *REGS[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 static int TAB = 8;
 static List *functions = &EMPTY_LIST;
+
+/* FIXME: main program should take extern variables from codegen. */
 FILE *outfp;
 static int stackpos;
 

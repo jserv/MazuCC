@@ -28,7 +28,7 @@ Alternatively, MazuCC accepts the stream from standard input. The equivalent
  form for the above command is:
 
  ```shell
- cat sample/nqueen.c | ./mzcc -
+ $ cat sample/nqueen.c | ./mzcc -
  ```
 
 You will get the generated x86_64 assembly in AT&T syntax. The output can be
