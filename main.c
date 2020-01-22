@@ -16,7 +16,7 @@ static void usage()
             "  --dump-ast             Dump abstract syntax tree(AST)\n");
 }
 
-void print_usage_and_exit()
+static void print_usage_and_exit()
 {
     usage();
     exit(1);
