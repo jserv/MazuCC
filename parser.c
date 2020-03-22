@@ -198,7 +198,6 @@ static Ast *ast_for(Ast *init, Ast *cond, Ast *step, Ast *body)
     r->forinit = init;
     r->forcond = cond;
     r->forstep = step;
-    r->forstep = step;
     r->forbody = body;
     return r;
 }
