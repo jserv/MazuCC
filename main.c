@@ -65,9 +65,13 @@ static void parse_args(int argc, char **argv)
 
 static void open_output_file()
 {
-    if (outfile && !(outfp = fopen(outfile, "w"))) {
-        printf("Can not open file %s\n", outfile);
-        exit(1);
+    if (outfile) {
+        if (!(outfp = fopen(outfile, "w"))) {
+            printf("Can not open file %s\n", outfile);
+            exit(1);
+        }
+    } else {
+        outfp = stdout;
     }
 }
 
